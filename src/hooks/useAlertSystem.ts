@@ -11,6 +11,7 @@ interface AlertConfig {
   highBpmThreshold: number;
   spikeSensitivity: number;
   spikeWindowSeconds: number;
+  monitoringMode: 'standard' | 'afib';
 }
 
 export function useAlertSystem(
@@ -24,25 +25,51 @@ export function useAlertSystem(
     alertType: 'none',
     message: '',
   });
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sustainedStartRef = useRef<number | null>(null);
 
   // Check for alerts
   useEffect(() => {
     if (alert.isSilenced) return;
 
-    // Check high BPM
+    // Check high BPM with mode logic
     if (currentBpm >= config.highBpmThreshold) {
-      setAlert({
-        isAlert: true,
-        isSilenced: false,
-        alertType: 'high_bpm',
-        message: `HIGH BPM: ${currentBpm} exceeds threshold of ${config.highBpmThreshold}`,
-      });
-      return;
+      if (config.monitoringMode === 'afib') {
+        // AFib mode: only alert if sustained for 30 consecutive seconds
+        if (sustainedStartRef.current === null) {
+          sustainedStartRef.current = Date.now();
+        }
+        const elapsed = (Date.now() - sustainedStartRef.current) / 1000;
+        if (elapsed >= 30) {
+          setAlert({
+            isAlert: true,
+            isSilenced: false,
+            alertType: 'high_bpm',
+            message: `AFib ALERT: ${currentBpm} BPM sustained ≥30s (threshold ${config.highBpmThreshold})`,
+          });
+          return;
+        }
+        // Not yet 30s — clear any existing alert but keep counting
+        if (alert.isAlert && alert.alertType === 'high_bpm') {
+          setAlert({ isAlert: false, isSilenced: false, alertType: 'none', message: '' });
+        }
+      } else {
+        // Standard mode: immediate alert
+        sustainedStartRef.current = null;
+        setAlert({
+          isAlert: true,
+          isSilenced: false,
+          alertType: 'high_bpm',
+          message: `HIGH BPM: ${currentBpm} exceeds threshold of ${config.highBpmThreshold}`,
+        });
+        return;
+      }
+    } else {
+      // BPM dropped below threshold, reset sustained counter
+      sustainedStartRef.current = null;
     }
 
-    // Check spike
+    // Check spike (same in both modes)
     const windowStart = new Date(Date.now() - config.spikeWindowSeconds * 1000);
     const recentReadings = history.filter(h => h.time >= windowStart);
     if (recentReadings.length >= 2) {
@@ -59,8 +86,8 @@ export function useAlertSystem(
       }
     }
 
-    // Clear alert
-    if (alert.isAlert && !alert.isSilenced) {
+    // Clear alert if BPM is below threshold and no spike
+    if (alert.isAlert && !alert.isSilenced && currentBpm < config.highBpmThreshold) {
       setAlert({ isAlert: false, isSilenced: false, alertType: 'none', message: '' });
     }
   }, [currentBpm, history, config, alert.isSilenced, alert.isAlert]);
@@ -68,7 +95,6 @@ export function useAlertSystem(
   // Siren sound
   useEffect(() => {
     if (alert.isAlert && !alert.isSilenced) {
-      // Create oscillator-based siren
       try {
         const ctx = new AudioContext();
         const osc = ctx.createOscillator();
@@ -97,7 +123,7 @@ export function useAlertSystem(
 
   const silence = useCallback(() => {
     setAlert(prev => ({ ...prev, isSilenced: true, isAlert: false }));
-    // Auto-unsilence after 5 minutes
+    sustainedStartRef.current = null;
     if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
     silenceTimeoutRef.current = setTimeout(() => {
       setAlert(prev => ({ ...prev, isSilenced: false }));

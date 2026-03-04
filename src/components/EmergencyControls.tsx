@@ -1,14 +1,14 @@
 import { Phone, ShieldCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface EmergencyControlsProps {
   onSilence: () => void;
   isAlert: boolean;
   isSilenced: boolean;
   emergencyPhone?: string;
+  showCallButton?: boolean;
 }
 
-export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPhone }: EmergencyControlsProps) {
+export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPhone, showCallButton = false }: EmergencyControlsProps) {
   const handleCall = () => {
     if (emergencyPhone) {
       window.open(`tel:${emergencyPhone}`, '_self');
@@ -17,7 +17,7 @@ export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPho
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
-      {/* Silence button - always visible when alert is active or silenced */}
+      {/* Silence button */}
       <button
         onClick={onSilence}
         className={`w-full py-6 rounded-xl text-xl font-bold uppercase tracking-wider transition-all duration-200 ${
@@ -35,21 +35,18 @@ export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPho
         </div>
       </button>
 
-      {/* Emergency call button */}
-      <button
-        onClick={handleCall}
-        disabled={!emergencyPhone}
-        className={`w-full py-5 rounded-xl text-lg font-bold uppercase tracking-wider transition-all duration-200 ${
-          emergencyPhone
-            ? 'bg-destructive text-destructive-foreground glow-emergency hover:brightness-110'
-            : 'bg-muted text-muted-foreground cursor-not-allowed'
-        }`}
-      >
-        <div className="flex items-center justify-center gap-3">
-          <Phone className="w-6 h-6" />
-          {emergencyPhone ? 'Call Emergency Contact' : 'Set Contact in Settings'}
-        </div>
-      </button>
+      {/* Emergency call button — only visible during active alert */}
+      {showCallButton && emergencyPhone && (
+        <button
+          onClick={handleCall}
+          className="w-full py-5 rounded-xl text-lg font-bold uppercase tracking-wider transition-all duration-200 bg-destructive text-destructive-foreground glow-emergency hover:brightness-110"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <Phone className="w-6 h-6" />
+            Call Son
+          </div>
+        </button>
+      )}
     </div>
   );
 }
