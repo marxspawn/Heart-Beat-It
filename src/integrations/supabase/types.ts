@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      caregiver_links: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string | null
+          link_token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          link_token?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          link_token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      heart_rate_live: {
+        Row: {
+          bpm: number
+          id: string
+          is_alert: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bpm?: number
+          id?: string
+          is_alert?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bpm?: number
+          id?: string
+          is_alert?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      heart_rate_spikes: {
+        Row: {
+          acknowledged: boolean
+          bpm: number
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          previous_bpm: number | null
+          triggered_at: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          bpm: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          previous_bpm?: number | null
+          triggered_at?: string
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean
+          bpm?: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          previous_bpm?: number | null
+          triggered_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          emergency_contact_phone: string | null
+          high_bpm_threshold: number
+          id: string
+          spike_sensitivity: number
+          spike_window_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_contact_phone?: string | null
+          high_bpm_threshold?: number
+          id?: string
+          spike_sensitivity?: number
+          spike_window_seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emergency_contact_phone?: string | null
+          high_bpm_threshold?: number
+          id?: string
+          spike_sensitivity?: number
+          spike_window_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
