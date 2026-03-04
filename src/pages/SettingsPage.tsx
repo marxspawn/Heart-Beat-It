@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function SettingsPage() {
     spike_sensitivity: 20,
     spike_window_seconds: 60,
     emergency_contact_phone: '',
+    monitoring_mode: 'standard' as 'standard' | 'afib',
   });
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export default function SettingsPage() {
           spike_sensitivity: parsed.spike_sensitivity ?? 20,
           spike_window_seconds: parsed.spike_window_seconds ?? 60,
           emergency_contact_phone: parsed.emergency_contact_phone ?? '',
+          monitoring_mode: parsed.monitoring_mode ?? 'standard',
         });
       } catch {}
     }
@@ -48,6 +51,29 @@ export default function SettingsPage() {
       </header>
 
       <main className="max-w-md mx-auto px-4 py-8 space-y-6">
+        {/* Monitoring Mode Toggle */}
+        <div className="surface-glass rounded-xl p-5 space-y-3">
+          <label className="text-xs text-muted-foreground uppercase tracking-widest">Monitoring Mode</label>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-foreground font-medium text-sm">
+                {form.monitoring_mode === 'afib' ? '⚡ AFib Mode' : '● Standard Mode'}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {form.monitoring_mode === 'afib'
+                  ? 'Alert only if BPM stays above threshold for 30 consecutive seconds'
+                  : 'Alert immediately when BPM exceeds threshold'}
+              </p>
+            </div>
+            <Switch
+              checked={form.monitoring_mode === 'afib'}
+              onCheckedChange={(checked) =>
+                setForm(f => ({ ...f, monitoring_mode: checked ? 'afib' : 'standard' }))
+              }
+            />
+          </div>
+        </div>
+
         <div className="space-y-2">
           <label className="text-xs text-muted-foreground uppercase tracking-widest">High BPM Threshold</label>
           <input type="number" value={form.high_bpm_threshold} onChange={e => setForm(f => ({ ...f, high_bpm_threshold: +e.target.value }))} className={inputClass} min={60} max={200} />
@@ -66,7 +92,7 @@ export default function SettingsPage() {
         <div className="space-y-2">
           <label className="text-xs text-muted-foreground uppercase tracking-widest">Emergency Contact Phone</label>
           <input type="tel" value={form.emergency_contact_phone} onChange={e => setForm(f => ({ ...f, emergency_contact_phone: e.target.value }))} className={inputClass} placeholder="+1 555 123 4567" />
-          <p className="text-xs text-muted-foreground">Phone number for the emergency call button</p>
+          <p className="text-xs text-muted-foreground">Phone number for the emergency call button (visible during alerts only)</p>
         </div>
         <button onClick={handleSave} className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
           <Save className="w-5 h-5" /> Save Settings

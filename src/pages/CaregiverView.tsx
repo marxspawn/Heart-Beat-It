@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { BpmDisplay } from '@/components/BpmDisplay';
+import { Badge } from '@/components/ui/badge';
 import { Eye, Wifi, WifiOff } from 'lucide-react';
 
 export default function CaregiverView() {
   const { token } = useParams<{ token: string }>();
   const [bpm, setBpm] = useState<number | null>(null);
   const [isAlert, setIsAlert] = useState(false);
+  const [monitoringMode, setMonitoringMode] = useState<'standard' | 'afib'>('standard');
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +102,16 @@ export default function CaregiverView() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-16 flex flex-col items-center">
+        {/* Monitoring Mode Badge */}
+        <div className="mb-8">
+          <Badge
+            variant={monitoringMode === 'afib' ? 'destructive' : 'default'}
+            className="text-xs font-mono tracking-wider px-4 py-1"
+          >
+            {monitoringMode === 'afib' ? '⚡ AFib Mode — 30s Buffer' : '● Standard Mode'}
+          </Badge>
+        </div>
+
         {bpm !== null ? (
           <>
             <BpmDisplay bpm={bpm} isAlert={isAlert} />

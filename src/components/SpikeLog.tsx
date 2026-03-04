@@ -7,6 +7,7 @@ interface Spike {
   previous_bpm: number | null;
   triggered_at: string;
   acknowledged: boolean;
+  monitoring_mode?: 'standard' | 'afib';
 }
 
 interface SpikeLogProps {
@@ -37,6 +38,9 @@ export function SpikeLog({ spikes }: SpikeLogProps) {
                 <span className="text-muted-foreground">
                   (was {spike.previous_bpm})
                 </span>
+              )}
+              {spike.monitoring_mode === 'afib' && (
+                <span className="text-xs bg-destructive/20 text-destructive-foreground px-1.5 py-0.5 rounded font-mono">AFib</span>
               )}
             </div>
             <span className="text-muted-foreground text-xs">
