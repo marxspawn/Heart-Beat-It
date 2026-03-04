@@ -51,27 +51,39 @@ export default function SettingsPage() {
       </header>
 
       <main className="max-w-md mx-auto px-4 py-8 space-y-6">
-        {/* Monitoring Mode Toggle */}
-        <div className="surface-glass rounded-xl p-5 space-y-3">
+        {/* Monitoring Mode Selection */}
+        <div className="surface-glass rounded-xl p-5 space-y-4">
           <label className="text-xs text-muted-foreground uppercase tracking-widest">Monitoring Mode</label>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-foreground font-medium text-sm">
-                {form.monitoring_mode === 'afib' ? '⚡ AFib Mode' : '● Standard Mode'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {form.monitoring_mode === 'afib'
-                  ? 'Alert only if BPM stays above threshold for 30 consecutive seconds'
-                  : 'Alert immediately when BPM exceeds threshold'}
-              </p>
-            </div>
-            <Switch
-              checked={form.monitoring_mode === 'afib'}
-              onCheckedChange={(checked) =>
-                setForm(f => ({ ...f, monitoring_mode: checked ? 'afib' : 'standard' }))
-              }
-            />
-          </div>
+
+          <button
+            type="button"
+            onClick={() => setForm(f => ({ ...f, monitoring_mode: 'standard' }))}
+            className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
+              form.monitoring_mode === 'standard'
+                ? 'border-primary glow-neon bg-primary/10'
+                : 'border-border bg-secondary/50 opacity-60'
+            }`}
+          >
+            <p className="text-foreground font-bold text-sm">⚡ Instant Alert Mode</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Best for general monitoring. Alarm sounds immediately at threshold BPM.
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setForm(f => ({ ...f, monitoring_mode: 'afib' }))}
+            className={`w-full text-left rounded-xl p-4 border-2 transition-all ${
+              form.monitoring_mode === 'afib'
+                ? 'border-destructive glow-emergency bg-destructive/10'
+                : 'border-border bg-secondary/50 opacity-60'
+            }`}
+          >
+            <p className="text-foreground font-bold text-sm">💓 AFib Mode (Stabilized)</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Best for users with AFib. Alarm sounds only if Heart Rate stays at or above threshold for 30 consecutive seconds to prevent false alarms.
+            </p>
+          </button>
         </div>
 
         <div className="space-y-2">
