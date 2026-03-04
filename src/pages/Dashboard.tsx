@@ -87,9 +87,9 @@ export default function Dashboard() {
         <div className="flex justify-center">
           <Badge
             variant={settings.monitoring_mode === 'afib' ? 'destructive' : 'default'}
-            className="text-xs font-mono tracking-wider px-4 py-1"
+            className="text-sm font-mono tracking-wider px-5 py-1.5"
           >
-            {settings.monitoring_mode === 'afib' ? '⚡ AFib Mode — 30s Buffer' : '● Standard Mode'}
+            {settings.monitoring_mode === 'afib' ? 'MODE: AFib (30s Delay)' : 'MODE: Instant'}
           </Badge>
         </div>
 

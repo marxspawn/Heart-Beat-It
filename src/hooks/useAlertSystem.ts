@@ -69,20 +69,22 @@ export function useAlertSystem(
       sustainedStartRef.current = null;
     }
 
-    // Check spike (same in both modes)
-    const windowStart = new Date(Date.now() - config.spikeWindowSeconds * 1000);
-    const recentReadings = history.filter(h => h.time >= windowStart);
-    if (recentReadings.length >= 2) {
-      const minBpm = Math.min(...recentReadings.map(r => r.bpm));
-      const spike = currentBpm - minBpm;
-      if (spike >= config.spikeSensitivity) {
-        setAlert({
-          isAlert: true,
-          isSilenced: false,
-          alertType: 'spike',
-          message: `SPIKE: +${spike} BPM in ${config.spikeWindowSeconds}s`,
-        });
-        return;
+    // Check spike — in AFib mode, ignore spikes under 30s
+    if (config.monitoringMode !== 'afib') {
+      const windowStart = new Date(Date.now() - config.spikeWindowSeconds * 1000);
+      const recentReadings = history.filter(h => h.time >= windowStart);
+      if (recentReadings.length >= 2) {
+        const minBpm = Math.min(...recentReadings.map(r => r.bpm));
+        const spike = currentBpm - minBpm;
+        if (spike >= config.spikeSensitivity) {
+          setAlert({
+            isAlert: true,
+            isSilenced: false,
+            alertType: 'spike',
+            message: `SPIKE: +${spike} BPM in ${config.spikeWindowSeconds}s`,
+          });
+          return;
+        }
       }
     }
 

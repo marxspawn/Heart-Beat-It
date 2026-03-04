@@ -106,9 +106,9 @@ export default function CaregiverView() {
         <div className="mb-8">
           <Badge
             variant={monitoringMode === 'afib' ? 'destructive' : 'default'}
-            className="text-xs font-mono tracking-wider px-4 py-1"
+            className="text-sm font-mono tracking-wider px-5 py-1.5"
           >
-            {monitoringMode === 'afib' ? '⚡ AFib Mode — 30s Buffer' : '● Standard Mode'}
+            {monitoringMode === 'afib' ? '💓 AFib Mode Active — 30s Stabilized' : 'MODE: Instant'}
           </Badge>
         </div>
 
