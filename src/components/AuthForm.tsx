@@ -33,7 +33,7 @@ export function AuthForm() {
       <div className="w-full max-w-sm surface-glass rounded-2xl p-8">
         <div className="flex flex-col items-center gap-2 mb-8">
           <Heart className="w-12 h-12 text-neon animate-heartbeat" fill="currentColor" />
-          <h1 className="text-2xl font-bold font-mono text-neon">HART beat it</h1>
+          <h1 className="text-2xl font-bold font-mono text-neon">Heart Beat-It</h1>
           <p className="text-muted-foreground text-sm">Monitor. Alert. Protect.</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -34,7 +34,7 @@ export default function SetupPage() {
         <div className="text-center space-y-3">
           <Heart className="w-12 h-12 text-primary mx-auto" />
           <h1 className="font-mono font-bold text-foreground text-2xl tracking-wider">
-            HART beat it
+            Heart Beat-It
           </h1>
           <p className="text-muted-foreground text-sm">
             Let's set up your emergency contact so the app can help when it matters most.
