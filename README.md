@@ -6,6 +6,7 @@
 
 ## 📋 Features
 
+* **AFib Tracking & Tuning:** Specialized capability to "tune in" and monitor heart rate patterns specifically for users managing AFib issues.
 * **Guided Setup:** A dedicated setup screen to ensure the application is configured correctly upon first launch.
 * **Stabilized Monitoring:** Built-in 30-second delay logic to ensure heart rate readings are consistent and reliable before display.
 * **High-Visibility Dashboard:** Large, easy-to-read metrics designed for quick check-ins.
