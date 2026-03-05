@@ -5,10 +5,11 @@ interface EmergencyControlsProps {
   isAlert: boolean;
   isSilenced: boolean;
   emergencyPhone?: string;
+  emergencyLabel?: string;
   showCallButton?: boolean;
 }
 
-export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPhone, showCallButton = false }: EmergencyControlsProps) {
+export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPhone, emergencyLabel, showCallButton = false }: EmergencyControlsProps) {
   const handleCall = () => {
     if (emergencyPhone) {
       window.open(`tel:${emergencyPhone}`, '_self');
@@ -43,7 +44,7 @@ export function EmergencyControls({ onSilence, isAlert, isSilenced, emergencyPho
         >
           <div className="flex items-center justify-center gap-3">
             <Phone className="w-6 h-6" />
-            Call Son
+            {emergencyLabel || 'Emergency Call'}
           </div>
         </button>
       )}
