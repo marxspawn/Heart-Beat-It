@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const heartRate = useHeartRateSimulator();
+  const { overrideBpm, setOverrideBpm, ...heartRate } = useHeartRateSimulator();
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [spikes, setSpikes] = useState<any[]>([]);
 
@@ -112,6 +112,30 @@ export default function Dashboard() {
         <HeartRateChart history={heartRate.history} threshold={settings.high_bpm_threshold} />
 
         <SpikeLog spikes={spikes} />
+
+        {/* Mock Control Panel */}
+        <div className="surface-glass rounded-xl p-4 space-y-3 border border-border/50">
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-mono">🧪 Mock Controls</p>
+          <div className="flex items-center gap-3">
+            <label className="text-sm text-foreground font-mono">Override BPM:</label>
+            <input
+              type="number"
+              value={overrideBpm ?? ''}
+              onChange={e => setOverrideBpm(e.target.value ? +e.target.value : null)}
+              placeholder="Auto"
+              className="w-24 px-3 py-2 rounded-lg bg-input border border-border text-foreground font-mono text-sm"
+            />
+            <button
+              onClick={() => setOverrideBpm(null)}
+              className="px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-xs font-mono"
+            >
+              Reset
+            </button>
+          </div>
+          {overrideBpm !== null && (
+            <p className="text-xs text-neon font-mono">⚡ Locked at {overrideBpm} BPM</p>
+          )}
+        </div>
       </main>
     </div>
   );
