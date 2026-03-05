@@ -50,7 +50,7 @@ export default function SettingsPage() {
         <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-secondary transition-colors">
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </button>
-        <h1 className="font-mono font-bold text-foreground text-sm tracking-wider">SETTINGS</h1>
+        <h1 className="font-mono font-bold text-foreground text-sm tracking-wider">Heart Beat-It — SETTINGS</h1>
       </header>
 
       <main className="max-w-md mx-auto px-4 py-8 space-y-6">
