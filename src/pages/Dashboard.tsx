@@ -68,7 +68,7 @@ export default function Dashboard() {
       <header className="flex items-center justify-between px-4 py-3 border-b border-border/50">
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-neon" />
-          <h1 className="font-mono font-bold text-neon text-sm tracking-wider">HEART BEAT IT</h1>
+          <h1 className="font-mono font-bold text-neon text-sm tracking-wider">HART beat it</h1>
         </div>
         <div className="flex items-center gap-1">
           <button onClick={handleExportReport} className="p-2 rounded-lg hover:bg-secondary transition-colors" title="Generate Doctor Report">
