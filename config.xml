@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.heartbeat.guardian" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Heartbeat Guardian</name>
+<widget id="com.hart.beatit" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>HART beat it</name>
     <description>Heart rate monitoring and alert system</description>
-    <author>Heartbeat Guardian</author>
+    <author>HART beat it</author>
     <plugin name="cordova-plugin-device" />
     <access origin="*" />
     <content src="index.html" />
