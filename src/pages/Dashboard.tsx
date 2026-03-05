@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
   spike_sensitivity: 20,
   spike_window_seconds: 60,
   emergency_contact_phone: null as string | null,
+  emergency_contact_label: null as string | null,
   monitoring_mode: 'standard' as 'standard' | 'afib',
 };
 
@@ -106,6 +107,7 @@ export default function Dashboard() {
           isAlert={alert.isAlert}
           isSilenced={alert.isSilenced}
           emergencyPhone={settings.emergency_contact_phone ?? undefined}
+          emergencyLabel={settings.emergency_contact_label ?? undefined}
           showCallButton={alert.isAlert && !alert.isSilenced}
         />
 

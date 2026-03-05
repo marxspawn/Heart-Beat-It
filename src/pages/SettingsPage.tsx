@@ -11,6 +11,7 @@ export default function SettingsPage() {
     spike_sensitivity: 20,
     spike_window_seconds: 60,
     emergency_contact_phone: '',
+    emergency_contact_label: '',
     monitoring_mode: 'standard' as 'standard' | 'afib',
   });
 
@@ -24,6 +25,7 @@ export default function SettingsPage() {
           spike_sensitivity: parsed.spike_sensitivity ?? 20,
           spike_window_seconds: parsed.spike_window_seconds ?? 60,
           emergency_contact_phone: parsed.emergency_contact_phone ?? '',
+          emergency_contact_label: parsed.emergency_contact_label ?? '',
           monitoring_mode: parsed.monitoring_mode ?? 'standard',
         });
       } catch {}
@@ -34,6 +36,7 @@ export default function SettingsPage() {
     localStorage.setItem('heartbeatit_settings', JSON.stringify({
       ...form,
       emergency_contact_phone: form.emergency_contact_phone || null,
+      emergency_contact_label: form.emergency_contact_label || null,
     }));
     toast.success('Settings saved');
     navigate('/');
@@ -101,10 +104,18 @@ export default function SettingsPage() {
           <input type="number" value={form.spike_window_seconds} onChange={e => setForm(f => ({ ...f, spike_window_seconds: +e.target.value }))} className={inputClass} min={10} max={300} />
           <p className="text-xs text-muted-foreground">Time window to detect spikes</p>
         </div>
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground uppercase tracking-widest">Emergency Contact Phone</label>
-          <input type="tel" value={form.emergency_contact_phone} onChange={e => setForm(f => ({ ...f, emergency_contact_phone: e.target.value }))} className={inputClass} placeholder="+1 555 123 4567" />
-          <p className="text-xs text-muted-foreground">Phone number for the emergency call button (visible during alerts only)</p>
+        {/* Edit Emergency Contact */}
+        <div className="surface-glass rounded-xl p-5 space-y-4">
+          <label className="text-xs text-muted-foreground uppercase tracking-widest">Edit Emergency Contact</label>
+          <div className="space-y-2">
+            <label className="text-xs text-muted-foreground">Button Label</label>
+            <input type="text" value={form.emergency_contact_label} onChange={e => setForm(f => ({ ...f, emergency_contact_label: e.target.value }))} className={inputClass} placeholder='e.g. "Call Michael"' maxLength={40} />
+            <p className="text-xs text-muted-foreground">This text appears on the emergency button during alerts</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs text-muted-foreground">Phone Number</label>
+            <input type="tel" value={form.emergency_contact_phone} onChange={e => setForm(f => ({ ...f, emergency_contact_phone: e.target.value }))} className={inputClass} placeholder="+1 555 123 4567" />
+          </div>
         </div>
         <button onClick={handleSave} className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2">
           <Save className="w-5 h-5" /> Save Settings
