@@ -9,6 +9,7 @@ import { SpikeLog } from '@/components/SpikeLog';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { generateDoctorReport } from '@/lib/reportExport';
+import { supabase } from '@/integrations/supabase/client';
 
 const DEFAULT_SETTINGS = {
   high_bpm_threshold: 110,
@@ -24,6 +25,8 @@ export default function Dashboard() {
   const { overrideBpm, setOverrideBpm, ...heartRate } = useHeartRateSimulator();
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [spikes, setSpikes] = useState<any[]>([]);
+  const [liveDbBpm, setLiveDbBpm] = useState<number | null>(null);
+  const [dbConnected, setDbConnected] = useState(false);
 
   // Load settings from localStorage
   useEffect(() => {
@@ -33,7 +36,48 @@ export default function Dashboard() {
     }
   }, []);
 
-  const { alert, silence } = useAlertSystem(heartRate.bpm, heartRate.history, {
+  // Subscribe to heart_rates table for real device data
+  useEffect(() => {
+    // Fetch latest reading
+    const fetchLatest = async () => {
+      try {
+        const { data } = await supabase
+          .from('heart_rates')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (data) {
+          setLiveDbBpm(data.bpm);
+          setDbConnected(true);
+        }
+      } catch {
+        // Supabase not ready yet, that's ok
+      }
+    };
+    fetchLatest();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel('heart_rates_realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'heart_rates' },
+        (payload) => {
+          const row = payload.new as any;
+          setLiveDbBpm(row.bpm);
+          setDbConnected(true);
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  // Use live DB BPM if available, otherwise fall back to simulator
+  const displayBpm = liveDbBpm !== null ? liveDbBpm : heartRate.bpm;
+
+  const { alert, silence } = useAlertSystem(displayBpm, heartRate.history, {
     highBpmThreshold: settings.high_bpm_threshold,
     spikeSensitivity: settings.spike_sensitivity,
     spikeWindowSeconds: settings.spike_window_seconds,
@@ -84,14 +128,19 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-8 space-y-8">
-        {/* Monitoring Mode Badge */}
-        <div className="flex justify-center">
+        {/* Data Source Indicator */}
+        <div className="flex justify-center gap-2">
           <Badge
             variant={settings.monitoring_mode === 'afib' ? 'destructive' : 'default'}
             className="text-sm font-mono tracking-wider px-5 py-1.5"
           >
             {settings.monitoring_mode === 'afib' ? 'MODE: AFib (30s Delay)' : 'MODE: Instant'}
           </Badge>
+          {dbConnected && (
+            <Badge variant="outline" className="text-sm font-mono tracking-wider px-3 py-1.5 border-neon text-neon">
+              📡 Live
+            </Badge>
+          )}
         </div>
 
         {alert.isAlert && !alert.isSilenced && (
@@ -100,7 +149,17 @@ export default function Dashboard() {
           </div>
         )}
 
-        <BpmDisplay bpm={heartRate.bpm} isAlert={alert.isAlert && !alert.isSilenced} />
+        {!dbConnected && liveDbBpm === null && heartRate.history.length === 0 ? (
+          <div className="flex flex-col items-center gap-4 py-16">
+            <Activity className="w-12 h-12 text-muted-foreground animate-pulse" />
+            <p className="text-muted-foreground font-mono text-lg">Waiting for Data...</p>
+            <p className="text-muted-foreground/60 text-sm text-center max-w-xs">
+              Connect a heart rate device or use the mock controls below to start monitoring.
+            </p>
+          </div>
+        ) : (
+          <BpmDisplay bpm={displayBpm} isAlert={alert.isAlert && !alert.isSilenced} />
+        )}
 
         <EmergencyControls
           onSilence={silence}
