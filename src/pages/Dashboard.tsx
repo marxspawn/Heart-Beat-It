@@ -9,7 +9,6 @@ import { SpikeLog } from '@/components/SpikeLog';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 import { generateDoctorReport } from '@/lib/reportExport';
-import { supabase } from '@/integrations/supabase/client';
 
 const DEFAULT_SETTINGS = {
   high_bpm_threshold: 110,
@@ -38,40 +37,60 @@ export default function Dashboard() {
 
   // Subscribe to heart_rates table for real device data
   useEffect(() => {
-    // Fetch latest reading
-    const fetchLatest = async () => {
+    let isMounted = true;
+    let cleanup: (() => void) | undefined;
+
+    const initRealtime = async () => {
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+        console.warn('Backend env not found in build. Running in simulator-only mode.');
+        return;
+      }
+
       try {
-        const { data } = await supabase
+        const { supabase } = await import('@/integrations/supabase/client');
+
+        const { data, error } = await supabase
           .from('heart_rates')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (data) {
+
+        if (error) {
+          console.error('Failed to fetch latest heart rate:', error);
+        } else if (data && isMounted) {
           setLiveDbBpm(data.bpm);
           setDbConnected(true);
         }
-      } catch {
-        // Supabase not ready yet, that's ok
+
+        const channel = supabase
+          .channel('heart_rates_realtime')
+          .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'heart_rates' },
+            (payload) => {
+              if (!isMounted) return;
+              const row = payload.new as any;
+              setLiveDbBpm(row.bpm);
+              setDbConnected(true);
+            }
+          )
+          .subscribe();
+
+        cleanup = () => {
+          supabase.removeChannel(channel);
+        };
+      } catch (error) {
+        console.error('Realtime initialization failed:', error);
       }
     };
-    fetchLatest();
 
-    // Realtime subscription
-    const channel = supabase
-      .channel('heart_rates_realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'heart_rates' },
-        (payload) => {
-          const row = payload.new as any;
-          setLiveDbBpm(row.bpm);
-          setDbConnected(true);
-        }
-      )
-      .subscribe();
+    void initRealtime();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      isMounted = false;
+      cleanup?.();
+    };
   }, []);
 
   // Use live DB BPM if available, otherwise fall back to simulator

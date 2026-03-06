@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Dashboard from '@/pages/Dashboard';
 import { Activity } from 'lucide-react';
+
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
 
 const Index = () => {
   const navigate = useNavigate();
@@ -32,7 +33,20 @@ const Index = () => {
   }
 
   if (!ready) return null;
-  return <Dashboard />;
+
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+          <Activity className="w-10 h-10 text-neon animate-pulse" />
+          <p className="text-muted-foreground font-mono text-sm">Loading dashboard...</p>
+        </div>
+      }
+    >
+      <Dashboard />
+    </Suspense>
+  );
 };
 
 export default Index;
+
