@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AppErrorBoundary } from "@/components/AppErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { toast } from "sonner";
@@ -30,19 +31,22 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/setup" element={<SetupPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/share" element={<SharePage />} />
-            <Route path="/caregiver/:token" element={<CaregiverView />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </HashRouter>
+        <AppErrorBoundary>
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/setup" element={<SetupPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/share" element={<SharePage />} />
+              <Route path="/caregiver/:token" element={<CaregiverView />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </HashRouter>
+        </AppErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
   );
 };
 
 export default App;
+
