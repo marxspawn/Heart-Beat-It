@@ -1,1 +1,4 @@
 project_id = "ewwervydnjjolsywcwod"
+
+[functions.fitbit-webhook]
+verify_jwt = false
