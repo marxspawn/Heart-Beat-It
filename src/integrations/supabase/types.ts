@@ -98,6 +98,27 @@ export type Database = {
         }
         Relationships: []
       }
+      heart_rates: {
+        Row: {
+          bpm: number
+          created_at: string
+          id: string
+          status: string
+        }
+        Insert: {
+          bpm: number
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          bpm?: number
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           created_at: string
